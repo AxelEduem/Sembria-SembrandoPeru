@@ -1,0 +1,2 @@
+minimumReleaseAgeExclude:
+  - '@supabase/cli-linux-x64@2.117.0'

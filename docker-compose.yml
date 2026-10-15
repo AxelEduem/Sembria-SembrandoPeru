@@ -1,0 +1,103 @@
+services:
+
+  postgres:
+    image: postgres:17
+    container_name: sembria-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: Sembria
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - sembria_postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d Sembria"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+
+  api:
+    image: sembria-api:local
+    container_name: sembria-api
+    restart: unless-stopped
+
+    environment:
+      APP_NAME: Laravel
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_KEY: ${APP_KEY}
+      APP_URL: http://localhost:8000
+
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: Sembria
+      DB_USERNAME: postgres
+      DB_PASSWORD: ${DB_PASSWORD}
+
+      SESSION_DRIVER: database
+      SESSION_LIFETIME: 120
+      SESSION_ENCRYPT: "true"
+
+      SANCTUM_STATEFUL_DOMAINS: localhost:8080,127.0.0.1:8080
+      FRONTEND_URL: http://localhost:8080
+
+      FILESYSTEM_DISK: public
+
+      QUEUE_CONNECTION: database
+      CACHE_STORE: database
+
+      SESSION_SECURE_COOKIE: "false"
+      SESSION_HTTP_ONLY: "true"
+      SESSION_SAME_SITE: lax
+
+    volumes:
+      - ./backend:/var/www/html
+      - sembria_public_storage:/var/www/html/storage/app/public
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+
+  api-nginx:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.nginx
+
+    container_name: sembria-api-nginx
+    restart: unless-stopped
+
+    ports:
+      - "8000:80"
+
+    volumes:
+      - ./backend:/var/www/html:ro
+      - sembria_public_storage:/storage
+
+    depends_on:
+      - api
+
+
+  web:
+    image: sembria-web:local
+    container_name: sembria-web
+    restart: unless-stopped
+
+    ports:
+      - "8080:80"
+
+    depends_on:
+      - api-nginx
+
+
+volumes:
+  sembria_postgres_data:
+  sembria_public_storage:

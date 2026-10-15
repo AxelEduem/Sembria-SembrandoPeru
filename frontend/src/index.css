@@ -1,0 +1,196 @@
+@import "tailwindcss";
+
+html {
+  font-size: 16px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 15.5px;
+  }
+}
+
+@media (min-width: 1280px) {
+  html {
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 1536px) {
+  html {
+    font-size: 14.5px;
+  }
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+}
+
+@keyframes module-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes module-section-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.995);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.module-page-enter {
+  animation: module-page-enter 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.module-section-enter {
+  animation: module-section-enter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--module-enter-delay, 80ms);
+}
+
+@keyframes integrante-form-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.992);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes integrante-form-enter-left {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes integrante-form-enter-right {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.integrante-form-fields-enter {
+  animation: integrante-form-enter 430ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.integrante-form-fields-enter[data-integrante-type="voluntario"] {
+  animation-name: integrante-form-enter-left;
+}
+
+.integrante-form-fields-enter[data-integrante-type="practicante"] {
+  animation-name: integrante-form-enter-right;
+}
+
+@keyframes module-row-enter {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.module-row-enter {
+  animation: module-row-enter 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.module-enter-delay-1 {
+  --module-enter-delay: 80ms;
+}
+
+.module-enter-delay-2 {
+  --module-enter-delay: 150ms;
+}
+
+.module-enter-delay-3 {
+  --module-enter-delay: 220ms;
+}
+
+.module-enter-delay-4 {
+  --module-enter-delay: 290ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .module-page-enter,
+  .module-section-enter,
+  .module-row-enter,
+  .integrante-form-fields-enter {
+    animation: none;
+  }
+}
+
+[data-slot="dropdown-menu-content"] {
+  background-color: #ffffff;
+  color: #1e293b;
+  border-color: #e2e8f0;
+  box-shadow: 0 10px 15px -3px rgb(15 23 42 / 0.12);
+}
+
+[data-slot="dropdown-menu-item"][data-highlighted] {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+@keyframes toast-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes toast-lift {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-18px);
+  }
+}
+
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}

@@ -1,0 +1,141 @@
+services:
+
+  # =========================================================
+  # API - Laravel + PHP-FPM
+  # =========================================================
+  api:
+    image: ${ECR_API_IMAGE}
+
+    container_name: sembria-api
+
+    restart: unless-stopped
+
+    env_file:
+      - ./backend/.env.production
+
+    expose:
+      - "9000"
+
+    networks:
+      - sembria
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "php -r '$$f=@fsockopen(\"127.0.0.1\",9000,$$e,$$s,2); exit($$f ? 0 : 1);'"
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+
+  # =========================================================
+  # WORKER - Laravel queues
+  # =========================================================
+  worker:
+    image: ${ECR_API_IMAGE}
+
+    container_name: sembria-worker
+
+    restart: unless-stopped
+
+    env_file:
+      - ./backend/.env.production
+
+    command:
+      - php
+      - artisan
+      - queue:work
+      - --sleep=3
+      - --tries=3
+      - --timeout=90
+      - --max-time=3600
+
+    stop_grace_period: 2m
+
+    depends_on:
+      api:
+        condition: service_healthy
+
+    networks:
+      - sembria
+
+
+  # =========================================================
+  # SCHEDULER - Laravel scheduled commands
+  # =========================================================
+  scheduler:
+    image: ${ECR_API_IMAGE}
+
+    container_name: sembria-scheduler
+
+    restart: unless-stopped
+
+    env_file:
+      - ./backend/.env.production
+
+    command:
+      - php
+      - artisan
+      - schedule:work
+
+    stop_grace_period: 30s
+
+    depends_on:
+      api:
+        condition: service_healthy
+
+    networks:
+      - sembria
+
+
+  # =========================================================
+  # NGINX - API
+  # =========================================================
+  api-nginx:
+    image: ${ECR_API_NGINX_IMAGE}
+
+    container_name: sembria-api-nginx
+
+    restart: unless-stopped
+
+    ports:
+      - "8000:80"
+
+    depends_on:
+      api:
+        condition: service_healthy
+
+    networks:
+      - sembria
+
+
+  # =========================================================
+  # FRONTEND - React + Nginx
+  # =========================================================
+  web:
+    image: ${ECR_WEB_IMAGE}
+
+    container_name: sembria-web
+
+    restart: unless-stopped
+
+    ports:
+      - "8080:80"
+
+    depends_on:
+      - api-nginx
+
+    networks:
+      - sembria
+
+
+# =========================================================
+# NETWORK
+# =========================================================
+
+networks:
+  sembria:
+    driver: bridge
